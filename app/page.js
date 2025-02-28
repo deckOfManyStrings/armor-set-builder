@@ -44,12 +44,12 @@ export default function Home() {
             <p className="text-blue-700">
               Select skills to find the best armor set combination
             </p>
-            <Link 
+            {/* <Link 
               href="/manage-data" 
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition"
             >
               Manage Armor Data
-            </Link>
+            </Link> */}
           </div>
         </div>
         
