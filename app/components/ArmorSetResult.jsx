@@ -3,8 +3,17 @@
 import { useState } from 'react';
 import { skills } from '../data/skills';
 
-export default function ArmorSetResult({ armorSet, totalSkills }) {
-  const [expanded, setExpanded] = useState(false);
+export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
+  if (isLoading) {
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-sm my-4 border border-gray-200 flex justify-center items-center py-8">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3"></div>
+          <p className="text-gray-600">Finding the best armor set...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!armorSet || !armorSet.pieces || armorSet.pieces.length === 0) {
     return (
@@ -94,11 +103,8 @@ export default function ArmorSetResult({ armorSet, totalSkills }) {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm my-4 border border-gray-200">
-      <div className="flex justify-between items-center cursor-pointer" onClick={() => setExpanded(!expanded)}>
+      <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold text-gray-800">Recommended Armor Set</h3>
-        <button className="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 hover:bg-blue-50 rounded transition">
-          {expanded ? 'Hide Details' : 'Show Details'}
-        </button>
       </div>
       
       {hasImpossibleSkills && (
@@ -150,113 +156,109 @@ export default function ArmorSetResult({ armorSet, totalSkills }) {
         )}
       </div>
 
-      {expanded && (
-        <>
-          <div className="mt-4">
-            <h4 className="font-bold text-gray-800 mb-3 pb-1 border-b border-gray-200">
-              Armor Pieces
-            </h4>
-            
-            {/* Set grouping */}
-            <div className="mb-3">
-              {Object.values(setGroups).map((group) => (
-                <div key={group.name} className="text-xs flex items-center mb-1">
-                  <div className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded mr-2">{group.count}x</div>
-                  <span className="font-medium text-gray-700">{group.name}</span>
-                </div>
-              ))}
+      <div className="mt-4">
+        <h4 className="font-bold text-gray-800 mb-3 pb-1 border-b border-gray-200">
+          Armor Pieces
+        </h4>
+        
+        {/* Set grouping */}
+        <div className="mb-3">
+          {Object.values(setGroups).map((group) => (
+            <div key={group.name} className="text-xs flex items-center mb-1">
+              <div className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded mr-2">{group.count}x</div>
+              <span className="font-medium text-gray-700">{group.name}</span>
             </div>
-            
-            <div className="space-y-2">
-              {['head', 'chest', 'arms', 'waist', 'legs'].map(type => (
-                <div key={type} className="flex justify-between p-3 bg-gray-50 rounded border border-gray-200 text-sm">
-                  <div className="overflow-hidden w-3/5">
-                    <div className="flex items-center">
-                      <span className="capitalize font-medium text-gray-800 mr-1">{type}:</span>
-                      <span className="text-gray-700 truncate">{armorPieces[type]?.name || 'None'}</span>
-                    </div>
-                    <div className="text-gray-600 text-xs mt-0.5">
-                      {armorPieces[type]?.skills?.map(skill => {
-                        const skillData = skills.find(s => s.id === skill.id);
-                        return (
-                          <span key={skill.id} className="mr-2">
-                            {skillData?.name} {Array(skill.level).fill('●').join('')}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="text-gray-700 shrink-0 ml-1 flex flex-col items-end justify-between">
-                    <div className="font-medium">DEF: {armorPieces[type]?.defense || 0}</div>
-                    {armorPieces[type]?.resistances && (
-                      <div className="flex gap-1 text-xs">
-                        {Object.entries(armorPieces[type].resistances)
-                          .filter(([_, value]) => value !== 0)
-                          .map(([element, value]) => (
-                            <span 
-                              key={element} 
-                              className={`${value > 0 ? 'text-green-600' : 'text-red-600'} font-mono`}
-                              title={`${element.charAt(0).toUpperCase() + element.slice(1)} resistance`}
-                            >
-                              {element.charAt(0).toUpperCase()}{value > 0 ? '+' : ''}{value}
-                            </span>
-                          ))
-                        }
-                      </div>
-                    )}
-                  </div>
+          ))}
+        </div>
+        
+        <div className="space-y-2">
+          {['head', 'chest', 'arms', 'waist', 'legs'].map(type => (
+            <div key={type} className="flex justify-between p-3 bg-gray-50 rounded border border-gray-200 text-sm">
+              <div className="overflow-hidden w-3/5">
+                <div className="flex items-center">
+                  <span className="capitalize font-medium text-gray-800 mr-1">{type}:</span>
+                  <span className="text-gray-700 truncate">{armorPieces[type]?.name || 'None'}</span>
                 </div>
-              ))}
+                <div className="text-gray-600 text-xs mt-0.5">
+                  {armorPieces[type]?.skills?.map(skill => {
+                    const skillData = skills.find(s => s.id === skill.id);
+                    return (
+                      <span key={skill.id} className="mr-2">
+                        {skillData?.name} {Array(skill.level).fill('●').join('')}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="text-gray-700 shrink-0 ml-1 flex flex-col items-end justify-between">
+                <div className="font-medium">DEF: {armorPieces[type]?.defense || 0}</div>
+                {armorPieces[type]?.resistances && (
+                  <div className="flex gap-1 text-xs">
+                    {Object.entries(armorPieces[type].resistances)
+                      .filter(([_, value]) => value !== 0)
+                      .map(([element, value]) => (
+                        <span 
+                          key={element} 
+                          className={`${value > 0 ? 'text-green-600' : 'text-red-600'} font-mono`}
+                          title={`${element.charAt(0).toUpperCase() + element.slice(1)} resistance`}
+                        >
+                          {element.charAt(0).toUpperCase()}{value > 0 ? '+' : ''}{value}
+                        </span>
+                      ))
+                    }
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          ))}
+        </div>
+      </div>
 
-          <div className="mt-4">
-            <h4 className="font-bold text-gray-800 mb-3 pb-1 border-b border-gray-200">
-              Resulting Skills
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {Object.entries(allProvidedSkills)
-                .sort(([_, a], [__, b]) => {
-                  // Sort by whether it was desired first, then by level
-                  if ((a.desired > 0) !== (b.desired > 0)) {
-                    return b.desired > 0 ? 1 : -1;
-                  }
-                  return b.level - a.level;
-                })
-                .map(([skillId, { name, level, desired }]) => {
-                  const skillData = skills.find(s => s.id === skillId);
-                  const effect = skillData?.effects?.find(e => e.level === level)?.effect;
-                  const isDesired = desired > 0;
-                  
-                  return (
-                    <div 
-                      key={skillId} 
-                      className={`flex flex-col p-2 rounded border ${
-                        isDesired ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
-                      } text-sm`}
-                    >
-                      <div className="flex justify-between">
-                        <span className={`truncate mr-1 font-medium ${isDesired ? 'text-blue-800' : 'text-gray-800'}`}>
-                          {name}
-                          {isDesired && level >= desired && 
-                            <span className="ml-1 text-green-600 text-xs">✓</span>
-                          }
-                        </span>
-                        <span className={`font-medium shrink-0 ${isDesired ? 'text-blue-700' : 'text-gray-700'}`}>
-                          Lv. {level}{isDesired ? `/${desired}` : ''}
-                        </span>
-                      </div>
-                      {effect && (
-                        <span className="text-gray-600 text-xs mt-1">{effect}</span>
-                      )}
-                    </div>
-                  );
-                })
+      <div className="mt-4">
+        <h4 className="font-bold text-gray-800 mb-3 pb-1 border-b border-gray-200">
+          Resulting Skills
+        </h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {Object.entries(allProvidedSkills)
+            .sort(([_, a], [__, b]) => {
+              // Sort by whether it was desired first, then by level
+              if ((a.desired > 0) !== (b.desired > 0)) {
+                return b.desired > 0 ? 1 : -1;
               }
-            </div>
-          </div>
-        </>
-      )}
+              return b.level - a.level;
+            })
+            .map(([skillId, { name, level, desired }]) => {
+              const skillData = skills.find(s => s.id === skillId);
+              const effect = skillData?.effects?.find(e => e.level === level)?.effect;
+              const isDesired = desired > 0;
+              
+              return (
+                <div 
+                  key={skillId} 
+                  className={`flex flex-col p-2 rounded border ${
+                    isDesired ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                  } text-sm`}
+                >
+                  <div className="flex justify-between">
+                    <span className={`truncate mr-1 font-medium ${isDesired ? 'text-blue-800' : 'text-gray-800'}`}>
+                      {name}
+                      {isDesired && level >= desired && 
+                        <span className="ml-1 text-green-600 text-xs">✓</span>
+                      }
+                    </span>
+                    <span className={`font-medium shrink-0 ${isDesired ? 'text-blue-700' : 'text-gray-700'}`}>
+                      Lv. {level}{isDesired ? `/${desired}` : ''}
+                    </span>
+                  </div>
+                  {effect && (
+                    <span className="text-gray-600 text-xs mt-1">{effect}</span>
+                  )}
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
     </div>
   );
 }
