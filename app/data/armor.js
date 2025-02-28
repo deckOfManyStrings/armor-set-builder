@@ -314,7 +314,7 @@ export const armorSets = [
         type: "head",
         rarity: 6,
         defense: 66,
-        slots: [1],
+        slots: [],
         resistances: {
           fire: 2,
           water: 0,
@@ -342,7 +342,7 @@ export const armorSets = [
           ice: 0,
           dragon: -3,
         },
-        skills: [{ id: "weakness_exploit", level: 1 },],
+        skills: [{ id: "weakness_exploit", level: 1 }],
         setGroupSkills: [{ id: "alluring_pelt" }],
       },
       {
@@ -371,7 +371,7 @@ export const armorSets = [
         type: "chest",
         rarity: 6,
         defense: 66,
-        slots: [2, 1],
+        slots: [3, 2],
         resistances: {
           fire: 2,
           water: 0,
@@ -380,7 +380,7 @@ export const armorSets = [
           dragon: -3,
         },
         skills: [{ id: "weakness_exploit", level: 1 }],
-        setGroupSkills: [{ id: "fortifying_pelt" }],
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
       {
         id: "arkvulcan_vambraces_alpha",
@@ -400,7 +400,7 @@ export const armorSets = [
           { id: "convert_element", level: 1 },
           { id: "recovery_speed", level: 1 },
         ],
-        setGroupSkills: [{ id: "alluring_pelt" }],
+        setGroupSkills: [{ id: "fortifying_pelt" }],
       },
       {
         id: "arkvulcan_vambraces_beta",
@@ -408,7 +408,7 @@ export const armorSets = [
         type: "arms",
         rarity: 6,
         defense: 66,
-        slots: [2, 1],
+        slots: [2, 2, 1],
         resistances: {
           fire: 2,
           water: 0,
@@ -416,10 +416,8 @@ export const armorSets = [
           ice: 0,
           dragon: -3,
         },
-        skills: [
-          { id: "convert_element", level: 1 },
-        ],
-        setGroupSkills: [{ id: "fortifying_pelt" }],
+        skills: [{ id: "convert_element", level: 1 }],
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
       {
         id: "arkvulcan_coil_alpha",
@@ -439,7 +437,7 @@ export const armorSets = [
           { id: "weakness_exploit", level: 2 },
           { id: "recovery_speed", level: 1 },
         ],
-        setGroupSkills: [{ id: "alluring_pelt" }],
+        setGroupSkills: [{ id: "fortifying_pelt" }],
       },
       {
         id: "arkvulcan_coil_beta",
@@ -447,7 +445,7 @@ export const armorSets = [
         type: "waist",
         rarity: 6,
         defense: 66,
-        slots: [2, 1],
+        slots: [1, 1],
         resistances: {
           fire: 2,
           water: 0,
@@ -455,8 +453,11 @@ export const armorSets = [
           ice: 0,
           dragon: -3,
         },
-        skills: [{ id: "fire_attack", level: 1 }],
-        setGroupSkills: [{ id: "fortifying_pelt" }],
+        skills: [
+          { id: "weakness_exploit", level: 2 },
+          { id: "recovery_speed", level: 1 },
+        ],
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
       {
         id: "arkvulcan_greaves_alpha",
@@ -464,7 +465,7 @@ export const armorSets = [
         type: "legs",
         rarity: 6,
         defense: 66,
-        slots: [1],
+        slots: [2, 1],
         resistances: {
           fire: 2,
           water: 0,
@@ -484,7 +485,7 @@ export const armorSets = [
         type: "legs",
         rarity: 6,
         defense: 66,
-        slots: [2, 1],
+        slots: [3, 1],
         resistances: {
           fire: 2,
           water: 0,
@@ -496,10 +497,10 @@ export const armorSets = [
           { id: "quick_sheathe", level: 1 },
           { id: "convert_element", level: 1 },
         ],
-        setGroupSkills: [{ id: "fortifying_pelt" }],
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
     ],
-    setSkills: [{id: "arkvelds_hunger"}],
+    setSkills: [{ id: "arkvelds_hunger" }],
     groupSkills: [{ id: "alluring_pelt" }, { id: "fortifying_pelt" }],
   },
 ];
