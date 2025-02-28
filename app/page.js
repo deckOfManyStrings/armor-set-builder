@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SkillSelector from './components/SkillSelector';
 import ArmorSetResult from './components/ArmorSetResult';
+import GroupSkills from './components/GroupSkills';
 import { findSimpleArmorSet } from './utils/armorFinder';
 
 export default function Home() {
@@ -58,6 +59,9 @@ export default function Home() {
               selectedSkills={selectedSkills} 
               onSkillsChange={setSelectedSkills} 
             />
+            
+            {/* Add the Group Skills Display component */}
+            <GroupSkills />
           </div>
           
           <div>
@@ -90,6 +94,10 @@ export default function Home() {
                 <p>
                   This tool helps you find the optimal armor combination to achieve your desired skills.
                   Select the skills you want, and we'll recommend the best armor set.
+                </p>
+                <p className="mt-2">
+                  <strong>New in Monster Hunter Wilds:</strong> Group Skills are special skills that activate when
+                  you equip 3 or more armor pieces with the same Group Skill, even if they're from different armor sets.
                 </p>
                 <p className="mt-2">
                   You can manage your armor database using the Manage Data page.

@@ -1,17 +1,87 @@
 // utils/armorFinder.js
 import { allArmorPieces } from '../data/armor';
+import { skills } from '../data/skills';
 
-/**
- * Find the best armor set combination based on selected skills
- * @param {Array} targetSkills - Array of {id, level} objects representing desired skills
- * @returns {Object} The best armor set combination
- */
-export function findBestArmorSet(targetSkills) {
-  if (!targetSkills || targetSkills.length === 0) {
+// Find all Group Skills available in the armor data
+export function getAllGroupSkills() {
+  const groupSkillsMap = {};
+  
+  // Extract all group skills from armor sets
+  allArmorPieces.forEach(piece => {
+    if (piece.setGroupSkills) {
+      piece.setGroupSkills.forEach(groupSkill => {
+        if (!groupSkillsMap[groupSkill.id]) {
+          // Find the skill data
+          const skillData = skills.find(s => s.id === groupSkill.id);
+          if (skillData) {
+            groupSkillsMap[groupSkill.id] = {
+              id: groupSkill.id,
+              name: skillData.name,
+              description: skillData.description,
+              pieces: []
+            };
+          }
+        }
+        // Add this piece to the group skill's pieces list
+        if (groupSkillsMap[groupSkill.id]) {
+          groupSkillsMap[groupSkill.id].pieces.push(piece.id);
+        }
+      });
+    }
+  });
+  
+  return Object.values(groupSkillsMap);
+}
+
+// Calculate which group skills are active for a given armor set
+export function calculateActiveGroupSkills(armorPieces) {
+  const groupSkillsCount = {};
+  const activeGroupSkills = [];
+  
+  // Count pieces for each group skill
+  armorPieces.forEach(piece => {
+    if (piece.setGroupSkills) {
+      piece.setGroupSkills.forEach(groupSkill => {
+        groupSkillsCount[groupSkill.id] = (groupSkillsCount[groupSkill.id] || 0) + 1;
+      });
+    }
+  });
+  
+  // Check which group skills are active (3 or more pieces)
+  Object.entries(groupSkillsCount).forEach(([skillId, count]) => {
+    if (count >= 3) {
+      const skillData = skills.find(s => s.id === skillId);
+      if (skillData) {
+        activeGroupSkills.push({
+          id: skillId,
+          name: skillData.name,
+          count: count,
+          effect: skillData.effects[0].effect
+        });
+      }
+    }
+  });
+  
+  return activeGroupSkills;
+}
+
+// Enhanced armor finder that considers group skills
+export function findSimpleArmorSet(selectedSkills) {
+  if (!selectedSkills || selectedSkills.length === 0) {
     return null;
   }
-
-  // Group armor pieces by type
+  
+  // Create a map for faster skill lookup
+  const desiredSkills = {};
+  selectedSkills.forEach(skill => {
+    desiredSkills[skill.id] = {
+      name: skill.name,
+      desired: skill.level,
+      level: 0
+    };
+  });
+  
+  // Filter available armor by types for each slot
   const armorByType = {
     head: allArmorPieces.filter(piece => piece.type === 'head'),
     chest: allArmorPieces.filter(piece => piece.type === 'chest'),
@@ -19,165 +89,134 @@ export function findBestArmorSet(targetSkills) {
     waist: allArmorPieces.filter(piece => piece.type === 'waist'),
     legs: allArmorPieces.filter(piece => piece.type === 'legs')
   };
-
-  // Get all possible combinations
-  // For a real app with many armor pieces, you'd want a more efficient algorithm
-  // This is a simplified version for demonstration
-  let bestScore = -1;
-  let bestCombination = null;
-  let bestSkillsTotal = null;
-
-  // Helper function to evaluate a combination
-  const evaluateCombination = (combination) => {
-    // Calculate total skills provided by the combination
-    const skillsProvided = {};
-    
-    combination.forEach(piece => {
-      if (!piece) return;
-      
-      piece.skills.forEach(skill => {
-        if (!skillsProvided[skill.id]) {
-          skillsProvided[skill.id] = { level: 0, name: skill.id };
-        }
-        skillsProvided[skill.id].level += skill.level;
-      });
-    });
-
-    // For each skill in skillsProvided, find its name from the targetSkills
-    for (const skillId in skillsProvided) {
-      const targetSkill = targetSkills.find(s => s.id === skillId);
-      if (targetSkill) {
-        skillsProvided[skillId].name = targetSkill.name;
-      }
-    }
-
-    // Calculate score based on how well the combination matches target skills
-    let score = 0;
-    for (const targetSkill of targetSkills) {
-      const provided = skillsProvided[targetSkill.id]?.level || 0;
-      // Only count up to the required level
-      const effective = Math.min(provided, targetSkill.level);
-      score += effective;
-      
-      // Bonus for exact matches
-      if (provided === targetSkill.level) {
-        score += 0.5;
-      }
-    }
-
-    // Penalty for missing required skills
-    for (const targetSkill of targetSkills) {
-      if (!skillsProvided[targetSkill.id]) {
-        score -= 1;
-      }
-    }
-
-    return { score, skillsProvided };
-  };
-
-  // Try various combinations
-  // In a real app, this would use a more sophisticated algorithm
-  // For simplicity, we'll try each piece from each type
-  const combinations = [];
   
-  for (const head of armorByType.head) {
-    for (const chest of armorByType.chest) {
-      for (const arms of armorByType.arms) {
-        for (const waist of armorByType.waist) {
-          for (const legs of armorByType.legs) {
-            const combination = [head, chest, arms, waist, legs];
-            combinations.push(combination);
-            
-            const { score, skillsProvided } = evaluateCombination(combination);
-            
-            if (score > bestScore) {
-              bestScore = score;
-              bestCombination = combination;
-              bestSkillsTotal = skillsProvided;
-            }
-          }
-        }
+  // Simple greedy algorithm - select the best piece for each slot
+  const selectedPieces = [];
+  
+  // Find best head piece
+  let bestHeadPiece = findBestPieceForSkills(armorByType.head, desiredSkills);
+  if (bestHeadPiece) {
+    selectedPieces.push(bestHeadPiece);
+    updateSkillLevels(desiredSkills, bestHeadPiece);
+  }
+  
+  // Find best chest piece
+  let bestChestPiece = findBestPieceForSkills(armorByType.chest, desiredSkills);
+  if (bestChestPiece) {
+    selectedPieces.push(bestChestPiece);
+    updateSkillLevels(desiredSkills, bestChestPiece);
+  }
+  
+  // Find best arms piece
+  let bestArmsPiece = findBestPieceForSkills(armorByType.arms, desiredSkills);
+  if (bestArmsPiece) {
+    selectedPieces.push(bestArmsPiece);
+    updateSkillLevels(desiredSkills, bestArmsPiece);
+  }
+  
+  // Find best waist piece
+  let bestWaistPiece = findBestPieceForSkills(armorByType.waist, desiredSkills);
+  if (bestWaistPiece) {
+    selectedPieces.push(bestWaistPiece);
+    updateSkillLevels(desiredSkills, bestWaistPiece);
+  }
+  
+  // Find best legs piece
+  let bestLegsPiece = findBestPieceForSkills(armorByType.legs, desiredSkills);
+  if (bestLegsPiece) {
+    selectedPieces.push(bestLegsPiece);
+    updateSkillLevels(desiredSkills, bestLegsPiece);
+  }
+  
+  // Calculate group skills
+  const activeGroupSkills = calculateActiveGroupSkills(selectedPieces);
+  
+  // Add unlocked skills from Group Skills
+  activeGroupSkills.forEach(groupSkill => {
+    // Find the corresponding skill it unlocks
+    const groupSkillData = skills.find(s => s.id === groupSkill.id);
+    if (groupSkillData && groupSkillData.effects && groupSkillData.effects[0]) {
+      const unlockedSkillId = groupSkillData.effects[0].effect.split(': ')[1].toLowerCase().replace(' ', '_');
+      const unlockedSkillData = skills.find(s => s.id === unlockedSkillId);
+      
+      if (unlockedSkillData) {
+        // Add the unlocked skill to our total skills
+        desiredSkills[unlockedSkillId] = {
+          name: unlockedSkillData.name,
+          level: 1,
+          maxLevel: unlockedSkillData.maxLevel,
+          fromGroupSkill: groupSkill.name
+        };
       }
     }
-  }
-
-  // Return the best combination found
+  });
+  
   return {
-    pieces: bestCombination,
-    score: bestScore,
-    skills: bestSkillsTotal
+    pieces: selectedPieces,
+    skills: desiredSkills,
+    groupSkills: activeGroupSkills
   };
 }
 
-/**
- * A simpler but less optimal approach to find a matching armor set
- * This is more efficient for demonstration purposes but won't find the optimal solution
- */
-export function findSimpleArmorSet(targetSkills) {
-  if (!targetSkills || targetSkills.length === 0) {
+// Helper function to find the best armor piece for desired skills
+function findBestPieceForSkills(pieces, desiredSkills) {
+  if (!pieces || pieces.length === 0) {
     return null;
   }
-
-  // Create a scoring function for each piece
-  const scoreArmorPiece = (piece) => {
-    let score = 0;
-    for (const pieceSkill of piece.skills) {
-      const targetSkill = targetSkills.find(ts => ts.id === pieceSkill.id);
-      if (targetSkill) {
-        score += Math.min(pieceSkill.level, targetSkill.level);
-      }
-    }
-    return score;
-  };
-
-  // Find the best piece for each slot
-  const bestPieces = {};
-  const slotTypes = ['head', 'chest', 'arms', 'waist', 'legs'];
   
-  for (const type of slotTypes) {
-    const piecesOfType = allArmorPieces.filter(p => p.type === type);
-    if (piecesOfType.length > 0) {
-      bestPieces[type] = piecesOfType.reduce((best, current) => {
-        const bestScore = scoreArmorPiece(best);
-        const currentScore = scoreArmorPiece(current);
-        return currentScore > bestScore ? current : best;
-      }, piecesOfType[0]);
+  let bestPiece = null;
+  let bestScore = -1;
+  
+  pieces.forEach(piece => {
+    let score = calculatePieceScore(piece, desiredSkills);
+    
+    // Consider group skills as a tie-breaker
+    if (piece.setGroupSkills && piece.setGroupSkills.length > 0) {
+      score += 0.1; // Small bonus for pieces with group skills
     }
-  }
-
-  // Calculate total skills provided by the set
-  const skillsTotal = {};
-  const selectedPieces = Object.values(bestPieces);
-
-  for (const piece of selectedPieces) {
-    for (const skill of piece.skills) {
-      if (!skillsTotal[skill.id]) {
-        // Find the name from targetSkills
-        const targetSkill = targetSkills.find(ts => ts.id === skill.id);
-        skillsTotal[skill.id] = {
-          level: 0,
-          name: targetSkill ? targetSkill.name : skill.id
-        };
-      }
-      skillsTotal[skill.id].level += skill.level;
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestPiece = piece;
     }
-  }
+  });
+  
+  return bestPiece;
+}
 
-  // Add skills that are in the target but not achieved or not fully achieved
-  for (const targetSkill of targetSkills) {
-    if (!skillsTotal[targetSkill.id]) {
-      skillsTotal[targetSkill.id] = {
-        level: 0,
-        name: targetSkill.name
-      };
-    } else if (skillsTotal[targetSkill.id].level < targetSkill.level) {
-      // Mark as partially satisfied - the skill is found but not at the desired level
-      skillsTotal[targetSkill.id].desired = targetSkill.level;
+// Calculate a score for a piece based on how well it matches desired skills
+function calculatePieceScore(piece, desiredSkills) {
+  if (!piece.skills) {
+    return 0;
+  }
+  
+  let score = 0;
+  
+  piece.skills.forEach(skill => {
+    if (desiredSkills[skill.id]) {
+      const desired = desiredSkills[skill.id].desired;
+      const current = desiredSkills[skill.id].level;
+      
+      // How much this piece helps towards reaching the desired level
+      const remaining = Math.max(0, desired - current);
+      const contribution = Math.min(skill.level, remaining);
+      
+      score += contribution;
     }
-  }
+  });
+  
+  return score;
+}
 
-  return {
-    pieces: selectedPieces,
-    skills: skillsTotal
-  };
+// Update skill levels based on a selected armor piece
+function updateSkillLevels(desiredSkills, piece) {
+  if (!piece.skills) {
+    return;
+  }
+  
+  piece.skills.forEach(skill => {
+    if (desiredSkills[skill.id]) {
+      desiredSkills[skill.id].level += skill.level;
+    }
+  });
 }

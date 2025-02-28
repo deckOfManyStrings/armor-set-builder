@@ -68,6 +68,30 @@ export default function ArmorSetResult({ armorSet, totalSkills }) {
     return groups;
   }, {});
 
+  // Calculate all skills provided by the armor set
+  const allProvidedSkills = {};
+  
+  if (armorSet && armorSet.pieces) {
+    armorSet.pieces.forEach(piece => {
+      if (piece.skills) {
+        piece.skills.forEach(skill => {
+          const skillId = skill.id;
+          if (!allProvidedSkills[skillId]) {
+            const skillInfo = skills.find(s => s.id === skillId);
+            allProvidedSkills[skillId] = {
+              id: skillId,
+              name: skillInfo?.name || skillId,
+              level: skill.level,
+              desired: totalSkills[skillId]?.desired || 0
+            };
+          } else {
+            allProvidedSkills[skillId].level += skill.level;
+          }
+        });
+      }
+    });
+  }
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm my-4 border border-gray-200">
       <div className="flex justify-between items-center cursor-pointer" onClick={() => setExpanded(!expanded)}>
@@ -191,17 +215,36 @@ export default function ArmorSetResult({ armorSet, totalSkills }) {
               Resulting Skills
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {Object.entries(totalSkills)
-                .filter(([_, skill]) => skill.level > 0) // Only show skills with level > 0
-                .map(([skillId, { name, level }]) => {
+              {Object.entries(allProvidedSkills)
+                .sort(([_, a], [__, b]) => {
+                  // Sort by whether it was desired first, then by level
+                  if ((a.desired > 0) !== (b.desired > 0)) {
+                    return b.desired > 0 ? 1 : -1;
+                  }
+                  return b.level - a.level;
+                })
+                .map(([skillId, { name, level, desired }]) => {
                   const skillData = skills.find(s => s.id === skillId);
                   const effect = skillData?.effects?.find(e => e.level === level)?.effect;
+                  const isDesired = desired > 0;
                   
                   return (
-                    <div key={skillId} className="flex flex-col p-2 bg-gray-50 rounded border border-gray-200 text-sm">
+                    <div 
+                      key={skillId} 
+                      className={`flex flex-col p-2 rounded border ${
+                        isDesired ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                      } text-sm`}
+                    >
                       <div className="flex justify-between">
-                        <span className="truncate mr-1 font-medium text-gray-800">{name}</span>
-                        <span className="font-medium shrink-0 text-gray-700">Lv. {level}</span>
+                        <span className={`truncate mr-1 font-medium ${isDesired ? 'text-blue-800' : 'text-gray-800'}`}>
+                          {name}
+                          {isDesired && level >= desired && 
+                            <span className="ml-1 text-green-600 text-xs">✓</span>
+                          }
+                        </span>
+                        <span className={`font-medium shrink-0 ${isDesired ? 'text-blue-700' : 'text-gray-700'}`}>
+                          Lv. {level}{isDesired ? `/${desired}` : ''}
+                        </span>
                       </div>
                       {effect && (
                         <span className="text-gray-600 text-xs mt-1">{effect}</span>
