@@ -93,7 +93,7 @@ export default function Home() {
               <div className="text-gray-600">
                 <p>
                   This tool helps you find the optimal armor combination to achieve your desired skills.
-                  Select the skills you want, and we'll recommend the best armor set.
+                  Select the skills you want, and we&apos;ll recommend the best armor set.
                 </p>
                 <p className="mt-2">
                   This Armor builder is still a work in progress and may not always provide the best results or the correct information.
