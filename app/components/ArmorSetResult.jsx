@@ -101,6 +101,45 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
     });
   }
 
+  // Function to render decoration slots with appropriate visualization
+  const renderSlots = (slots) => {
+    if (!slots || slots.length === 0) return (
+      <div className="flex items-center text-gray-400">
+        <span className="text-gray-600 font-medium mr-1">Slots:</span>
+        <span>None</span>
+      </div>
+    );
+    
+    return (
+      <div className="flex items-center">
+        <span className="text-gray-600 font-medium mr-1">Slots:</span>
+        <div className="flex space-x-1">
+          {slots.map((size, index) => (
+            <div 
+              key={index} 
+              className={`flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold border ${getSlotColor(size)}`}
+              title={`Level ${size} decoration slot`}
+            >
+              {size}
+            </div>
+          ))}
+        </div>
+        <span className="ml-1 text-xs text-gray-500">({slots.length} × Lv. {slots.join('/')})</span>
+      </div>
+    );
+  };
+
+  // Get appropriate color based on slot size
+  const getSlotColor = (size) => {
+    switch(size) {
+      case 1: return "bg-gray-100 border-gray-300 text-gray-600";
+      case 2: return "bg-blue-50 border-blue-300 text-blue-600";
+      case 3: return "bg-purple-50 border-purple-300 text-purple-600";
+      case 4: return "bg-yellow-50 border-yellow-400 text-yellow-700";
+      default: return "bg-gray-100 border-gray-300 text-gray-600";
+    }
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm my-4 border border-gray-200">
       <div className="flex justify-between items-center">
@@ -161,6 +200,36 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
           Armor Pieces
         </h4>
         
+        <div className="mb-2 text-xs bg-gray-50 p-2 rounded border border-gray-200">
+          <p className="font-medium text-gray-700">Decoration slots legend:</p>
+          <div className="flex flex-wrap gap-2 mt-1">
+            <div className="flex items-center">
+              <div className="flex items-center justify-center h-4 w-4 rounded-full border bg-gray-100 border-gray-300 text-gray-600 text-xs font-bold mr-1">
+                1
+              </div>
+              <span>Level 1 slot</span>
+            </div>
+            <div className="flex items-center">
+              <div className="flex items-center justify-center h-4 w-4 rounded-full border bg-blue-50 border-blue-300 text-blue-600 text-xs font-bold mr-1">
+                2
+              </div>
+              <span>Level 2 slot</span>
+            </div>
+            <div className="flex items-center">
+              <div className="flex items-center justify-center h-4 w-4 rounded-full border bg-purple-50 border-purple-300 text-purple-600 text-xs font-bold mr-1">
+                3
+              </div>
+              <span>Level 3 slot</span>
+            </div>
+            <div className="flex items-center">
+              <div className="flex items-center justify-center h-4 w-4 rounded-full border bg-yellow-50 border-yellow-400 text-yellow-700 text-xs font-bold mr-1">
+                4
+              </div>
+              <span>Level 4 slot</span>
+            </div>
+          </div>
+        </div>
+        
         {/* Set grouping */}
         <div className="mb-3">
           {Object.values(setGroups).map((group) => (
@@ -173,33 +242,44 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
         
         <div className="space-y-2">
           {['head', 'chest', 'arms', 'waist', 'legs'].map(type => (
-            <div key={type} className="flex justify-between p-3 bg-gray-50 rounded border border-gray-200 text-sm">
-              <div className="overflow-hidden w-3/5">
+            <div key={type} className="flex flex-col p-3 bg-gray-50 rounded border border-gray-200 text-sm">
+              <div className="flex justify-between">
                 <div className="flex items-center">
                   <span className="capitalize font-medium text-gray-800 mr-1">{type}:</span>
                   <span className="text-gray-700 truncate">{armorPieces[type]?.name || 'None'}</span>
                 </div>
-                <div className="text-gray-600 text-xs mt-0.5">
-                  {armorPieces[type]?.skills?.map(skill => {
-                    const skillData = skills.find(s => s.id === skill.id);
-                    return (
-                      <span key={skill.id} className="mr-2">
-                        {skillData?.name} {Array(skill.level).fill('●').join('')}
-                      </span>
-                    );
-                  })}
-                </div>
+                <div className="text-gray-700 font-medium">DEF: {armorPieces[type]?.defense || 0}</div>
               </div>
-              <div className="text-gray-700 shrink-0 ml-1 flex flex-col items-end justify-between">
-                <div className="font-medium">DEF: {armorPieces[type]?.defense || 0}</div>
-                {armorPieces[type]?.resistances && (
-                  <div className="flex gap-1 text-xs">
+              
+              <div className="mt-1.5">
+                {renderSlots(armorPieces[type]?.slots)}
+              </div>
+              
+              {armorPieces[type]?.skills && armorPieces[type]?.skills.length > 0 && (
+                <div className="flex flex-wrap items-center mt-1.5">
+                  <span className="text-gray-600 font-medium mr-1">Skills:</span>
+                  <div className="flex flex-wrap gap-x-2">
+                    {armorPieces[type].skills.map(skill => {
+                      const skillData = skills.find(s => s.id === skill.id);
+                      return (
+                        <span key={skill.id} className="text-gray-700">
+                          {skillData?.name} {Array(skill.level).fill('●').join('')}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {armorPieces[type]?.resistances && (
+                <div className="flex items-center mt-1.5">
+                  <span className="text-gray-600 font-medium mr-1">Resistances:</span>
+                  <div className="flex gap-1.5 text-xs">
                     {Object.entries(armorPieces[type].resistances)
-                      .filter(([_, value]) => value !== 0)
                       .map(([element, value]) => (
                         <span 
                           key={element} 
-                          className={`${value > 0 ? 'text-green-600' : 'text-red-600'} font-mono`}
+                          className={`${value > 0 ? 'text-green-600' : value < 0 ? 'text-red-600' : 'text-gray-500'} font-mono`}
                           title={`${element.charAt(0).toUpperCase() + element.slice(1)} resistance`}
                         >
                           {element.charAt(0).toUpperCase()}{value > 0 ? '+' : ''}{value}
@@ -207,8 +287,8 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
                       ))
                     }
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
