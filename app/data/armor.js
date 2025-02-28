@@ -43,7 +43,7 @@ export const armorSets = [
           { id: "resentment", level: 1 },
           { id: "bombardier", level: 1 },
         ],
-        setGroupSkills: [{ id: "alluring_pelt" }]
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
       {
         id: "ajarakan_mail_alpha",
@@ -100,7 +100,7 @@ export const armorSets = [
           { id: "bombardier", level: 2 },
           { id: "partbreaker", level: 1 },
         ],
-        setGroupSkills: [{ id: "fortifying_pelt" }]
+        setGroupSkills: [{ id: "fortifying_pelt" }],
       },
       {
         id: "ajarakan_vambraces_beta",
@@ -120,7 +120,7 @@ export const armorSets = [
           { id: "resentment", level: 1 },
           { id: "bombardier", level: 1 },
         ],
-        setGroupSkills: [{ id: "alluring_pelt" }]
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
       {
         id: "ajarakan_coil_alpha",
@@ -140,7 +140,7 @@ export const armorSets = [
           { id: "blast_resistance", level: 2 },
           { id: "partbreaker", level: 1 },
         ],
-        setGroupSkills: [{ id: "fortifying_pelt" }]
+        setGroupSkills: [{ id: "fortifying_pelt" }],
       },
       {
         id: "ajarakan_coil_beta",
@@ -160,7 +160,7 @@ export const armorSets = [
           { id: "blast_resistance", level: 2 },
           { id: "partbreaker", level: 1 },
         ],
-        setGroupSkills: [{ id: "alluring_pelt" }]
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
       {
         id: "ajarakan_greaves_alpha",
@@ -180,7 +180,7 @@ export const armorSets = [
           { id: "partbreaker", level: 2 },
           { id: "resentment", level: 1 },
         ],
-        setGroupSkills: [{ id: "fortifying_pelt" }]
+        setGroupSkills: [{ id: "fortifying_pelt" }],
       },
       {
         id: "ajarakan_greves_beta",
@@ -197,11 +197,111 @@ export const armorSets = [
           dragon: 0,
         },
         skills: [{ id: "partbreaker", level: 2 }],
-        setGroupSkills: [{ id: "alluring_pelt" }]
+        setGroupSkills: [{ id: "alluring_pelt" }],
       },
     ],
     setSkills: [{}],
-    groupSkills: [{id: "fortifying_pelt"}, {id: "alluring_pelt"}],
+    groupSkills: [{ id: "fortifying_pelt" }, { id: "alluring_pelt" }],
+  },
+  {
+    id: "alloy",
+    name: "Alloy Set",
+    tier: "High Rank",
+    pieces: [
+      {
+        id: "alloy_helm_alpha",
+        name: "Alloy Helm Alpha",
+        type: "head",
+        rarity: 6,
+        defense: 32,
+        slots: [1],
+        resistances: {
+          fire: -2,
+          water: 1,
+          thunder: -2,
+          ice: 2,
+          dragon: 1,
+        },
+        skills: [{ id: "quick_sheathe", level: 1 }],
+        setGroupSkills: [{}],
+      },
+      {
+        id: "alloy_mail_alpha",
+        name: "Alloy Mail Alpha",
+        type: "chest",
+        rarity: 6,
+        defense: 32,
+        slots: [1],
+        resistances: {
+          fire: -2,
+          water: 1,
+          thunder: -2,
+          ice: 2,
+          dragon: 1,
+        },
+        skills: [{ id: "flinch_free", level: 2 }],
+        setGroupSkills: [{ id: "fortifying_pelt" }],
+      },
+      {
+        id: "alloy_vambraces_alpha",
+        name: "Alloy Vambraces Alpha",
+        type: "arms",
+        rarity: 6,
+        defense: 32,
+        slots: [2],
+        resistances: {
+          fire: -2,
+          water: 1,
+          thunder: -2,
+          ice: 2,
+          dragon: 1,
+        },
+        skills: [{ id: "tremor_resistance", level: 1 }],
+        setGroupSkills: [{ id: "fortifying_pelt" }],
+      },
+      {
+        id: "alloy_coil_alpha",
+        name: "Alloy Coil Alpha",
+        type: "waist",
+        rarity: 6,
+        defense: 32,
+        slots: [2],
+        resistances: {
+          fire: -2,
+          water: 1,
+          thunder: -2,
+          ice: 2,
+          dragon: 1,
+        },
+        skills: [
+          { id: "quick_sheathe", level: 1 },
+          { id: "tremor_resistance", level: 1 },
+        ],
+        setGroupSkills: [{ id: "fortifying_pelt" }],
+      },
+      {
+        id: "alloy_greaves_alpha",
+        name: "Alloy Greaves Alpha",
+        type: "legs",
+        rarity: 6,
+        defense: 32,
+        slots: [1],
+        resistances: {
+          fire: -2,
+          water: 1,
+          thunder: -2,
+          ice: 2,
+          dragon: 1,
+        },
+        skills: [
+          { id: "quick_sheathe", level: 1 },
+          { id: "flinch_free", level: 1 },
+        ],
+        setGroupSkills: [{ id: "fortifying_pelt" }],
+      },
+    ],
+    setSkills: [{}],
+    groupSkills: [{ id: "fortifying_pelt" }],
   },
 ];
 

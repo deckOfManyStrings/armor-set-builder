@@ -96,8 +96,7 @@ export default function Home() {
                   Select the skills you want, and we'll recommend the best armor set.
                 </p>
                 <p className="mt-2">
-                  <strong>New in Monster Hunter Wilds:</strong> Group Skills are special skills that activate when
-                  you equip 3 or more armor pieces with the same Group Skill, even if they're from different armor sets.
+                  This Armor builder is still a work in progress and may not always provide the best results or the correct information.
                 </p>
                 <p className="mt-2">
                   You can manage your armor database using the Manage Data page.
