@@ -140,6 +140,30 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
     }
   };
 
+  // Get color class for element type
+  const getElementColor = (element) => {
+    switch (element.toLowerCase()) {
+      case 'fire': return 'text-red-600';
+      case 'water': return 'text-blue-600';
+      case 'thunder': return 'text-yellow-600';
+      case 'ice': return 'text-slate-200';  // Using slate-200 for white to ensure visibility
+      case 'dragon': return 'text-purple-600';
+      default: return 'text-gray-600';
+    }
+  };
+  
+  // Get background color for element type (for labels/badges)
+  const getElementBgColor = (element) => {
+    switch (element.toLowerCase()) {
+      case 'fire': return 'bg-red-100';
+      case 'water': return 'bg-blue-100';
+      case 'thunder': return 'bg-yellow-100';
+      case 'ice': return 'bg-slate-100';
+      case 'dragon': return 'bg-purple-100';
+      default: return 'bg-gray-100';
+    }
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm my-4 border border-gray-200">
       <div className="flex justify-between items-center">
@@ -184,7 +208,9 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
             <div className="flex flex-wrap gap-x-3 justify-between text-sm text-gray-700">
               {Object.entries(elementalResistances).map(([element, value]) => (
                 <div key={element} className="flex items-center">
-                  <span className="capitalize font-medium mr-1">{element}:</span>
+                  <span className={`capitalize font-medium mr-1 ${getElementColor(element)}`}>
+                    {element}:
+                  </span>
                   <span className={`${value >= 0 ? 'text-green-600' : 'text-red-600'} font-bold`}>
                     {value > 0 ? '+' : ''}{value}
                   </span>
@@ -279,10 +305,13 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
                       .map(([element, value]) => (
                         <span 
                           key={element} 
-                          className={`${value > 0 ? 'text-green-600' : value < 0 ? 'text-red-600' : 'text-gray-500'} font-mono`}
+                          className={`flex items-center px-1.5 rounded ${getElementBgColor(element)} ${value >= 0 ? 'text-gray-800' : 'text-red-600'}`}
                           title={`${element.charAt(0).toUpperCase() + element.slice(1)} resistance`}
                         >
-                          {element.charAt(0).toUpperCase()}{value > 0 ? '+' : ''}{value}
+                          <span className={`font-medium ${getElementColor(element)}`}>
+                            {element.charAt(0).toUpperCase()}
+                          </span>
+                          <span>{value > 0 ? '+' : ''}{value}</span>
                         </span>
                       ))
                     }
@@ -341,15 +370,4 @@ export default function ArmorSetResult({ armorSet, totalSkills, isLoading }) {
       </div>
     </div>
   );
-}
-
-function getElementColor(element) {
-  switch (element) {
-    case 'fire': return 'text-red-600';
-    case 'water': return 'text-blue-600';
-    case 'thunder': return 'text-yellow-600';
-    case 'ice': return 'text-cyan-600';
-    case 'dragon': return 'text-purple-600';
-    default: return 'text-gray-600';
-  }
 }
