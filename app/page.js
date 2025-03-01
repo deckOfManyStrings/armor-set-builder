@@ -98,9 +98,6 @@ export default function Home() {
                 <p className="mt-2">
                   This Armor builder is still a work in progress and may not always provide the best results or the correct information.
                 </p>
-                <p className="mt-2">
-                  You can manage your armor database using the Manage Data page.
-                </p>
               </div>
             </div>
           </div>
